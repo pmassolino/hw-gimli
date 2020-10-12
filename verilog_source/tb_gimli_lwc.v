@@ -1209,6 +1209,9 @@ initial begin
                 end
             end
             dut_hash(test_input_pt_enc, pt_size,true_output_ct_enc, ct_size);
+            
+            #(25*G_PERIOD);
+            
             read_ignore_character(hash_file, "\n", temp_text1);
         end
         $fclose(hash_file);
@@ -1346,7 +1349,6 @@ initial begin
             end
             dut_aead_encrypt(test_input_key_enc, key_size, test_input_nonce_enc, nonce_size, test_input_ad_enc, ad_size, test_input_pt_enc, pt_size, true_output_ct_enc, ct_size, G_TAG_SIZE_WORDS*4);
             
-            
             // Decryption test
             test_input_key_dec = test_input_key_enc;
             test_input_nonce_dec = test_input_nonce_enc;
@@ -1365,6 +1367,7 @@ initial begin
             test_input_ct_dec[pt_size*8] = ~true_output_ct_enc[pt_size*8];
             
             dut_aead_decrypt(test_input_key_dec, key_size, test_input_nonce_dec, nonce_size, test_input_ad_dec, ad_size, test_input_ct_dec, ct_size, true_output_pt_dec, pt_size, 8'hF0);
+            
             
             read_ignore_character(aead_file, "\n", temp_text1);
         end

@@ -38,7 +38,7 @@
 #define G_SKIP_AEAD_TEST 0 // 1 - True, 0 - False
 #define ASYNC_RST 1
 #define DIN_DOUT_WIDTH 32
-#define SKIPPING_TESTS_MAX 10
+#define SKIPPING_TESTS_MAX 30
 
 class Testbench {
     public:

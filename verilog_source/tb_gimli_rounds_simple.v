@@ -82,7 +82,29 @@ task test_init_hash;
     output integer cycle_counts;
     begin
         cycle_counts = 0;
-        test_oper = 3'b111;
+        test_oper = 3'b100;
+        test_din = 128'b00;
+        test_din_size = 5'b00000;
+        test_din_valid = 1'b1;
+        test_dout_ready = 1'b1;
+        while(test_din_ready == 1'b0) begin
+            cycle_counts = cycle_counts + 1;
+            #(PERIOD);
+        end
+        cycle_counts = cycle_counts + 1;
+        #(PERIOD);
+        test_oper = 3'b101;
+        test_din = 128'b00;
+        test_din_size = 5'b00000;
+        test_din_valid = 1'b1;
+        test_dout_ready = 1'b1;
+        while(test_din_ready == 1'b0) begin
+            cycle_counts = cycle_counts + 1;
+            #(PERIOD);
+        end
+        cycle_counts = cycle_counts + 1;
+        #(PERIOD);
+        test_oper = 3'b110;
         test_din = 128'b00;
         test_din_size = 5'b00000;
         test_din_valid = 1'b1;
@@ -410,14 +432,14 @@ task test_squeeze_permute;
     integer temp_buffer_out, temp_j;
     begin
         cycle_counts = 0;
-        test_oper = 3'b011;
         test_din = 128'b00;
         test_din_size = 5'b00000;
         test_din_valid = 1'b0;
         test_dout_ready = 1'b0;
         buffer_out = {MAXIMUM_BUFFER_SIZE{1'b0}};
         temp_buffer_out = 0;
-        while(temp_buffer_out < buffer_size) begin
+        while(temp_buffer_out < (buffer_size-16)) begin
+            test_oper = 3'b011;
             test_din_valid = 1'b1;
             test_dout_ready = 1'b0;
             while(test_din_ready == 1'b0) begin
@@ -445,6 +467,29 @@ task test_squeeze_permute;
             test_din_valid = 1'b0;
             test_dout_ready = 1'b0;
         end
+        test_oper = 3'b111;
+        test_din_valid = 1'b1;
+        test_dout_ready = 1'b0;
+        while(test_din_ready == 1'b0) begin
+            cycle_counts = cycle_counts + 1;
+            #(PERIOD);
+        end
+        cycle_counts = cycle_counts + 1;
+        #(PERIOD);
+        test_din_valid = 1'b0;
+        test_dout_ready = 1'b1;
+        while(test_dout_valid == 1'b0) begin
+            cycle_counts = cycle_counts + 1;
+            #(PERIOD);
+        end
+        temp_j = 0;
+        while((temp_j < 16) && (temp_buffer_out < buffer_size)) begin
+            buffer_out[8*temp_buffer_out +: 8] = test_dout[8*temp_j +: 8];
+            temp_buffer_out = temp_buffer_out + 1;
+            temp_j = temp_j + 1;
+        end
+        cycle_counts = cycle_counts + 1;
+        #(PERIOD);
         test_oper = 3'b000;
         test_din = 128'b00;
         test_din_size = 5'b00000;

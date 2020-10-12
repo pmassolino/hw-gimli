@@ -114,11 +114,9 @@ always @(*) begin
                 next_state[255:128] = reg_state[255:128];
                 next_state[383:256] = din;
             end
-            // Init zero
+            // Squeeze no permute
             3'b111 : begin
-                next_state[127:0]   = {128{1'b0}};
-                next_state[255:128] = {128{1'b0}};
-                next_state[383:256] = {128{1'b0}};
+                next_state = reg_state;
             end
             default : begin
                 next_state = reg_state;
@@ -279,8 +277,8 @@ always @(*) begin
                     gimli_state[383:376] = reg_state[383:376] ^ 8'b00000001;
                 end
             end
-            // Squeeze and permute
-            3'b011 : begin
+            // Squeeze and permute, Squeeze
+            3'b011, 3'b111 : begin
                 gimli_state = reg_state;
             end
             default : begin
@@ -371,8 +369,8 @@ end
 always @(*) begin
     if((din_valid_and_ready == 1'b1) && (dout_valid_and_ready == 1'b1)) begin
         case (oper)
-            // Absorb encryption, Absorb decryption, Squeeze and permute
-            3'b001, 3'b010, 3'b011 : begin
+            // Absorb encryption, Absorb decryption, Squeeze and permute, Squeeze
+            3'b001, 3'b010, 3'b011, 3'b111 : begin
                 next_has_data_out = 1'b1;
             end
             default : begin
@@ -381,8 +379,8 @@ always @(*) begin
         endcase
     end else if(din_valid_and_ready == 1'b1) begin
         case (oper)
-            // Absorb encryption, Absorb decryption, Squeeze and permute
-            3'b001, 3'b010, 3'b011 : begin
+            // Absorb encryption, Absorb decryption, Squeeze and permute, Squeeze
+            3'b001, 3'b010, 3'b011, 3'b111 : begin
                 next_has_data_out = 1'b1;
             end
             default : begin
@@ -403,8 +401,8 @@ always @(*) begin
             3'b001, 3'b010 : begin
                 next_dout = din_xor_state_masked;
             end
-            // Squeeze and permute
-            3'b011 : begin
+            // Squeeze and permute, Squeeze
+            3'b011, 3'b111 : begin
                 next_dout = reg_state[127:0];
             end
             default : begin
@@ -423,8 +421,8 @@ always @(*) begin
             3'b001, 3'b010 : begin
                 next_dout_size = din_size;
             end
-            // Squeeze and permute
-            3'b011 : begin
+            // Squeeze and permute, Squeeze
+            3'b011, 3'b111 : begin
                 next_dout_size = 5'b10000;
             end
             default : begin

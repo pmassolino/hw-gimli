@@ -19,7 +19,7 @@
 #endif
 #endif
 
-#define MAX_SIMULATION_TICKS 100000000
+#define MAX_SIMULATION_TICKS 10000000
 
 #define G_MAXIMUM_BUFFER_SIZE_ARRAY 2048
 #define G_MAXIMUM_MESSAGE_SIZE_HASH 1024
@@ -45,7 +45,7 @@
 #define G_SWIDTH_MASK ((1UL << (G_SWIDTH)) - 1)
 #define G_SEGMENT_DATA_SIZE_MASK ((1U << 16)-1)
 
-#define SKIPPING_TESTS_MAX 50
+#define SKIPPING_TESTS_MAX 1
 
 
 class Testbench {
@@ -923,6 +923,13 @@ int main(int argc, char **argv) {
                 break;
             }
             tb->clock_tick();
+            
+            // The core might be busy because of an extra unnecessary function call.
+            // We need to wait at least 24 cycles.
+            for (j = 0; j < 25; j++){
+                tb->clock_tick();
+            }
+            
             read_ignore_character(hash_file, '\n', &temp_char1);
         }
         fclose(hash_file);
@@ -1012,6 +1019,7 @@ int main(int argc, char **argv) {
                 break;
             }
             tb->clock_tick();
+            
             // Decryption correct tag
             
             memcpy(test_input_key_dec, test_input_key_enc, key_size);
@@ -1045,6 +1053,7 @@ int main(int argc, char **argv) {
                 break;
             }
             tb->clock_tick();
+            
             read_ignore_character(aead_file, '\n', &temp_char1);
         }
         fclose(aead_file);

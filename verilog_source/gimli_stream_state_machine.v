@@ -61,7 +61,7 @@ localparam s_reset = 8'h00, s_idle = 8'h01,
            s_enc_dec_0 = 8'h20, s_enc_dec_1 = 8'h21, s_enc_dec_2 = 8'h22, s_enc_dec_3 = 8'h23, s_enc_dec_4 = 8'h24, s_enc_dec_5 = 8'h25, s_enc_dec_6 = 8'h26,
            s_enc_7 = 8'h27, s_enc_8 = 8'h28, s_enc_9 = 8'h29, s_enc_10 = 8'h2A, s_enc_11 = 8'h2B,
            s_dec_6 = 8'h36, s_dec_7 = 8'h37, s_dec_8 = 8'h38, s_dec_9 = 8'h39, s_dec_10 = 8'h3A, s_dec_11 = 8'h3B, s_dec_12 = 8'h3C, s_dec_13 = 8'h3D,
-           s_hash_0 = 8'h40, s_hash_1 = 8'h41, s_hash_2 = 8'h42, s_hash_3 = 8'h43, s_hash_4 = 8'h44, s_hash_5 = 8'h45, s_hash_6 = 8'h46
+           s_hash_0 = 8'h40, s_hash_1 = 8'h41, s_hash_2 = 8'h42, s_hash_3 = 8'h43, s_hash_4 = 8'h44, s_hash_5 = 8'h45, s_hash_6 = 8'h46, s_hash_7 = 8'h47, s_hash_8 = 8'h48
            ;
 reg[7:0] actual_state, next_state;
 
@@ -152,41 +152,52 @@ always @(*) begin
             next_inst_ready = 1'b1;
             next_buffer_in_din_oper = 1'b1;
         end
-        // Initialize the state and enable buffer in to receive data
+        // Initialize the state first column
         s_hash_0 : begin
             next_buffer_in_din_oper = 1'b1;
             next_p_core_din_oper = 2'b10;
-            next_buffer_out_din_oper = 2'b00;
-            next_p_core_oper = 3'b111;
+            next_p_core_oper = 3'b100;
+        end
+        // Initialize the state second column
+        s_hash_1 : begin
+            next_buffer_in_din_oper = 1'b1;
+            next_p_core_din_oper = 2'b10;
+            next_p_core_oper = 3'b101;
+        end
+        // Initialize the state third column
+        s_hash_2 : begin
+            next_buffer_in_din_oper = 1'b1;
+            next_p_core_din_oper = 2'b10;
+            next_p_core_oper = 3'b110;
         end
         // Absorb words
-        s_hash_1 : begin
+        s_hash_3 : begin
             ;
         end
         // Absorb the last word
-        s_hash_2 : begin
+        s_hash_4 : begin
             next_buffer_in_din_oper = 1'b1;
         end
         // Absorb empty message
-        s_hash_3 : begin
+        s_hash_5 : begin
             next_buffer_in_din_oper = 1'b1;
             next_p_core_din_oper = 2'b10;
         end
         // Send hash block 1
-        s_hash_4 : begin
+        s_hash_6 : begin
             next_buffer_in_din_oper = 1'b1;
             next_p_core_din_oper = 2'b10;
             next_p_core_oper = 3'b011;
         end
         // Send hash block 2
-        s_hash_5 : begin
+        s_hash_7 : begin
             next_buffer_in_din_oper = 1'b1;
             next_p_core_din_oper = 2'b10;
-            next_p_core_oper = 3'b011;
+            next_p_core_oper = 3'b111;
             next_sm_p_core_last = 1'b1;
         end
         // Wait hash block to be sent
-        s_hash_6 : begin
+        s_hash_8 : begin
             next_buffer_in_din_oper = 1'b1;
             next_p_core_din_oper = 2'b01;
         end
@@ -255,7 +266,7 @@ always @(*) begin
         s_enc_10 : begin
             next_buffer_in_din_oper = 1'b1;
             next_p_core_din_oper = 2'b10;
-            next_p_core_oper = 3'b011;
+            next_p_core_oper = 3'b111;
             next_sm_p_core_last = 1'b1;
         end
         // Wait Tag to be sent
@@ -280,7 +291,7 @@ always @(*) begin
         // Generate Tag and receive other tag
         s_dec_9 : begin
             next_p_core_din_oper = 2'b10;
-            next_p_core_oper = 3'b011;
+            next_p_core_oper = 3'b111;
             next_sm_p_core_last = 1'b1;
         end
         // Tag has been generated first, wait for buffer
@@ -292,7 +303,7 @@ always @(*) begin
         s_dec_11 : begin
             next_buffer_in_din_oper = 1'b1;
             next_p_core_din_oper = 2'b10;
-            next_p_core_oper = 3'b011;
+            next_p_core_oper = 3'b111;
             next_sm_p_core_last = 1'b1;
         end
         // Both available perform tag comparison
@@ -338,7 +349,7 @@ always @(*) begin
                 next_state = s_idle;
             end
         end
-        // Store din in buffer and initialize state
+        // Initialize state first column
         s_hash_0 : begin
             if(p_core_din_valid_and_ready == 1'b1) begin
                 next_state = s_hash_1;
@@ -346,45 +357,45 @@ always @(*) begin
                 next_state = s_hash_0;
             end
         end
-        // Absorb words
+        // Initialize state second column
         s_hash_1 : begin
-            if((din_valid_and_ready == 1'b1) && (din_last == 1'b1)) begin
+            if(p_core_din_valid_and_ready == 1'b1) begin
                 next_state = s_hash_2;
             end else begin
                 next_state = s_hash_1;
             end
         end
-        // Absorb the last word
+        // Initialize state third column
         s_hash_2 : begin
             if(p_core_din_valid_and_ready == 1'b1) begin
-                if((buffer_in_size_full == 1'b1)) begin
-                    // If size is full then insert an empty message
-                    next_state = s_hash_3;
-                end else begin
-                    // If size is not full then finish absorbtion
-                    next_state = s_hash_4;
-                end
+                next_state = s_hash_3;
             end else begin
                 next_state = s_hash_2;
             end
         end
-        // Absorb empty message
+        // Absorb words
         s_hash_3 : begin
-            if(p_core_din_valid_and_ready == 1'b1) begin
+            if((din_valid_and_ready == 1'b1) && (din_last == 1'b1)) begin
                 next_state = s_hash_4;
             end else begin
                 next_state = s_hash_3;
             end
         end
-        // Send hash block 1
+        // Absorb the last word
         s_hash_4 : begin
             if(p_core_din_valid_and_ready == 1'b1) begin
-                next_state = s_hash_5;
+                if((buffer_in_size_full == 1'b1)) begin
+                    // If size is full then insert an empty message
+                    next_state = s_hash_5;
+                end else begin
+                    // If size is not full then finish absorbtion
+                    next_state = s_hash_6;
+                end
             end else begin
                 next_state = s_hash_4;
             end
         end
-        // Send hash block 2
+        // Absorb empty message
         s_hash_5 : begin
             if(p_core_din_valid_and_ready == 1'b1) begin
                 next_state = s_hash_6;
@@ -392,12 +403,28 @@ always @(*) begin
                 next_state = s_hash_5;
             end
         end
-        // Wait hash block to be sent
+        // Send hash block 1
         s_hash_6 : begin
+            if(p_core_din_valid_and_ready == 1'b1) begin
+                next_state = s_hash_7;
+            end else begin
+                next_state = s_hash_6;
+            end
+        end
+        // Send hash block 2
+        s_hash_7 : begin
+            if(p_core_din_valid_and_ready == 1'b1) begin
+                next_state = s_hash_8;
+            end else begin
+                next_state = s_hash_7;
+            end
+        end
+        // Wait hash block to be sent
+        s_hash_8 : begin
             if((dout_valid_and_ready == 1'b1) && (buffer_out_dout_last == 1'b1)) begin
                 next_state = s_idle;
             end else begin
-                next_state = s_hash_6;
+                next_state = s_hash_8;
             end
         end
         // Receive first key part
