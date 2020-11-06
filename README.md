@@ -43,6 +43,6 @@ The implementation done in Verilog and doesn't use any files provided by the LWC
 
 ### Reference
 
-While the Gimli LWC API hardware doesn't have a specific paper, you can cite the NIST package submission.  
+While the Gimli LWC API hardware doesn't have a paper, you can cite the original CHES paper of the permutation.  
 	
 Daniel J. Bernstein, Stefan Kölbl, Stefan Lucks, Pedro Maat C. Massolino, Florian Mendel, Kashif Nawaz, Tobias Schneider, Peter Schwabe, François-Xavier Standaert, Yosuke Todo, Benoît Viguier. "Gimli: a cross-platform permutation". Cryptographic Hardware and Embedded Systems – CHES 2017. CHES 2017. Lecture Notes in Computer Science, vol 10529. Springer, Cham. [doi:10.1007/978-3-319-66787-4_15](https://doi.org/10.1007/978-3-319-66787-4_15). [LWC Submission](https://csrc.nist.gov/CSRC/media/Projects/lightweight-cryptography/documents/round-2/submissions-rnd2/gimli.zip) 
