@@ -1,6 +1,16 @@
 # read all source files
-source "source.tcl"
-#
+set verilog_sources_file [open $::env(SYNTH_VERILOG_FILES_FOLDER)/source_list.txt r]
+while { [gets $verilog_sources_file line] >= 0 } {
+    yosys read_verilog -I$::env(SYNTH_VERILOG_FILES_FOLDER) $::env(SYNTH_VERILOG_FILES_FOLDER)/$line
+}
+# Change the parameters that have been setted
+set temp_i 0
+while { $temp_i < $::env(SYNTH_VERILOG_TOP_NUMBER_PARAMETERS) } {
+    set parameter_name SYNTH_VERILOG_TOP_PARAMETER_NAME_$temp_i
+    set parameter_value SYNTH_VERILOG_TOP_PARAMETER_VALUE_$temp_i
+    yosys chparam -set $::env($parameter_name) $::env($parameter_value) "$::env(SYNTH_TOP_UNIT_NAME)"
+    incr temp_i 1
+}
 # Check, expand and clean up design hierarchy
 yosys hierarchy -check -top "$::env(SYNTH_TOP_UNIT_NAME)"
 #
@@ -48,10 +58,10 @@ yosys techmap
 # Perform simple optimizations
 yosys opt
 # Use ABC for technology mapping
-yosys abc -g simple
+yosys abc -g AND, OR, XOR
 #
 yosys opt_clean
 # Print some statistics
 yosys stat -top $::env(SYNTH_TOP_UNIT_NAME)
 #
-yosys write_verilog [expr {"$::env(SYNTH_OUTPUT_CIRCUIT_FOLDER)/$::env(SYNTH_TOP_UNIT_NAME).v"}]
+yosys write_verilog [expr {"$::env(SYNTH_OUTPUT_CIRCUIT_FOLDER)/$::env(SYNTH_OUTPUT_CIRCUIT_FILENAME).v"}]

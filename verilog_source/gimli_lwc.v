@@ -9,7 +9,7 @@
 `default_nettype    none
 
 module gimli_lwc
-#(parameter ASYNC_RSTN = 0,  // 0 - Synchronous reset in high, 1 - Asynchrouns reset in low.
+#(parameter ASYNC_RSTN = 0,         // 0 - Synchronous reset in high, 1 - Asynchrouns reset in low.
 parameter COMBINATIONAL_ROUNDS = 1, // Number of unrolled combinational rounds possible (Supported sizes : 1, 2, 3, 4, 6, 8, 12)
 parameter G_PWIDTH = 32,
 parameter G_SWIDTH = 32,
