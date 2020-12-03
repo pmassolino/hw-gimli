@@ -233,7 +233,6 @@ always @(*) begin
         end
         // Process last key
         s_key_4 : begin
-            next_sdi_oper = 1'b1;
             next_temp_data_oper = 2'b11;
             next_cipher_din_oper = 1'b1;
             next_reg_data_size_oper = 2'b10;
@@ -466,7 +465,6 @@ always @(*) begin
         end
         // Process last data
         s_hash_4 : begin
-            next_pdi_oper = 2'b10;
             next_temp_data_oper = 2'b10;
             next_cipher_din_oper = 1'b1;
             next_reg_data_size_oper = 2'b10;

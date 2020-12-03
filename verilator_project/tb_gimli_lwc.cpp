@@ -45,7 +45,7 @@
 #define G_SWIDTH_MASK ((1UL << (G_SWIDTH)) - 1)
 #define G_SEGMENT_DATA_SIZE_MASK ((1U << 16)-1)
 
-#define SKIPPING_TESTS_MAX 1
+#define SKIPPING_TESTS_MAX 40
 
 
 class Testbench {
